@@ -1,65 +1,245 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { FormEvent, useState } from 'react';
+import Card from '@/components/atoms/Card';
+import Button from '@/components/atoms/Button';
+import Input from '@/components/atoms/Input';
+import type { ProviderName } from '@/lib/types';
+import type { RankedTool } from '@/lib/ranking/tools';
+
+type SearchResult = {
+  provider: ProviderName;
+  appears: boolean;
+  rank: number | null;
+  url: string | null;
+  tools: RankedTool[];
+  modelUsed: string | null;
+  error: string | null;
+};
+
+const providerConfig: Record<string, { label: string; color: string; bgColor: string }> = {
+  perplexity: { label: 'Perplexity', color: '#22d3ee', bgColor: 'rgba(34,211,238,0.1)' },
+  chatgpt: { label: 'ChatGPT', color: '#10b981', bgColor: 'rgba(16,185,129,0.1)' },
+  gemini: { label: 'Gemini', color: '#818cf8', bgColor: 'rgba(129,140,248,0.1)' },
+};
+
+function getRankLabel(result: SearchResult, hasProduct: boolean): string {
+  if (!hasProduct) return 'Top 10 returned';
+  if (result.appears && result.rank) return `Found at #${result.rank}`;
+  return 'Not in top 10';
+}
+
+export default function DashboardPage() {
+  const [query, setQuery] = useState('');
+  const [product, setProduct] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [searched, setSearched] = useState(false);
+
+  const hasProduct = product.trim().length > 0;
+
+  const handleSearch = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSearched(true);
+
+    try {
+      const response = await fetch('/api/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, product }),
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        results?: SearchResult[];
+      };
+
+      if (!response.ok) {
+        setResults([]);
+        setError(data.error || 'Search failed');
+        return;
+      }
+
+      setResults(data.results ?? []);
+    } catch {
+      setResults([]);
+      setError('Search failed. Check your API key and server logs.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-bold text-white">AI Ranking Monitor</h1>
+        <p className="text-sm text-gray-500">
+          Search a topic, see the top 10 AI recommendations, and optionally check your product rank.
+        </p>
+      </div>
+
+      <Card>
+        <form onSubmit={handleSearch} className="space-y-4">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="ranking-query" className="text-sm font-medium text-gray-300">
+              Search text
+            </label>
+            <textarea
+              id="ranking-query"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Best AI CRM tools for B2B sales teams"
+              rows={4}
+              className="w-full resize-none px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all duration-200"
+              required
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-end">
+            <Input
+              id="product-check"
+              label="Product name or URL optional"
+              placeholder="HubSpot, hubspot.com, or https://www.hubspot.com/products/crm"
+              value={product}
+              onChange={(event) => setProduct(event.target.value)}
+            />
+            <Button type="submit" loading={loading} className="h-[42px] px-6">
+              {loading ? 'Searching...' : 'Search Rankings'}
+            </Button>
+          </div>
+        </form>
+      </Card>
+
+      {error && (
+        <Card padding="sm" className="border-red-500/20 bg-red-500/5">
+          <p className="text-sm text-red-300">{error}</p>
+        </Card>
+      )}
+
+      {searched && !error && results.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {results.map((result) => {
+            const config = providerConfig[result.provider] ?? {
+              label: result.provider,
+              color: '#9ca3af',
+              bgColor: 'rgba(156,163,175,0.1)',
+            };
+
+            return (
+              <Card key={result.provider} padding="sm">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs text-gray-500">Provider</p>
+                    <p className="text-sm font-semibold" style={{ color: config.color }}>
+                      {config.label}
+                    </p>
+                  </div>
+                  <span
+                    className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                      hasProduct
+                        ? result.appears
+                          ? 'bg-emerald-500/10 text-emerald-300'
+                          : 'bg-amber-500/10 text-amber-300'
+                        : 'bg-white/5 text-gray-300'
+                    }`}
+                  >
+                    {getRankLabel(result, hasProduct)}
+                  </span>
+                </div>
+              </Card>
+            );
+          })}
         </div>
-      </main>
+      )}
+
+      {searched && !error && results.length > 0 && (
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          {results.map((result) => {
+            const config = providerConfig[result.provider] ?? {
+              label: result.provider,
+              color: '#9ca3af',
+              bgColor: 'rgba(156,163,175,0.1)',
+            };
+
+            return (
+              <Card key={result.provider} padding="sm">
+                <div
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg mb-3"
+                  style={{ backgroundColor: config.bgColor }}
+                >
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: config.color }} />
+                  <span className="text-sm font-semibold" style={{ color: config.color }}>
+                    {config.label}
+                  </span>
+                  {result.modelUsed && (
+                    <span className="ml-auto text-[11px] text-gray-600 truncate max-w-[150px]">
+                      {result.modelUsed}
+                    </span>
+                  )}
+                </div>
+
+                {result.error ? (
+                  <p className="text-xs text-red-300 px-2 py-4">{result.error}</p>
+                ) : result.tools.length > 0 ? (
+                  <ol className="space-y-1.5">
+                    {result.tools.map((tool, index) => {
+                      const isMatch = hasProduct && result.rank === index + 1;
+
+                      return (
+                        <li
+                          key={`${result.provider}-${index}-${tool.url || tool.name}`}
+                          className={`flex items-start gap-2 text-xs py-2 px-2 rounded-lg transition-colors ${
+                            isMatch
+                              ? 'bg-emerald-500/10 border border-emerald-500/20'
+                              : 'hover:bg-white/[0.03] border border-transparent'
+                          }`}
+                        >
+                          <span className="text-gray-600 font-mono w-5 shrink-0 text-right">
+                            {index + 1}.
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-200 font-medium truncate">{tool.name}</span>
+                              {isMatch && (
+                                <span className="shrink-0 text-[11px] text-emerald-300">Match</span>
+                              )}
+                            </div>
+                            {tool.url && (
+                              <a
+                                href={tool.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block text-gray-600 hover:text-indigo-400 truncate transition-colors mt-0.5"
+                              >
+                                {tool.url}
+                              </a>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                ) : (
+                  <p className="text-xs text-gray-600 px-2 py-4 text-center">No tools returned</p>
+                )}
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {!searched && (
+        <Card>
+          <div className="text-center py-14">
+            <h2 className="text-lg font-semibold text-white mb-2">Start with a search query</h2>
+            <p className="text-sm text-gray-500 max-w-md mx-auto">
+              The results will show each provider&apos;s top 10 recommendations and your product&apos;s position when it appears.
+            </p>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
