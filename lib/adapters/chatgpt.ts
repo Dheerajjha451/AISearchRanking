@@ -5,8 +5,8 @@ import { extractToolsFromPayload, findToolMatch } from '@/lib/ranking/tools';
 /**
  * ChatGPT Adapter — via OpenRouter
  *
- * Uses OpenRouter's latest OpenAI GPT alias first, then free
- * OpenAI-compatible fallback models if the latest model fails.
+ * Uses OpenRouter's latest OpenAI GPT alias first, then current
+ * free OpenAI fallback models if the latest model fails.
  *
  * Primary model: ~openai/gpt-latest
  */
@@ -28,8 +28,13 @@ export async function checkChatGPT(
       apiKey,
       models: [
         '~openai/gpt-latest',
-        'openai/gpt-4.1-nano:free',
-        'openai/gpt-oss-20b:free',
+        { model: 'openai/gpt-oss-120b:free', plugins: [] },
+        { model: 'openai/gpt-oss-20b:free', plugins: [] },
+        { model: 'qwen/qwen3-next-80b-a3b-instruct:free', plugins: [] },
+        { model: 'google/gemma-4-31b-it:free', plugins: [] },
+        { model: 'google/gemma-4-26b-a4b-it:free', plugins: [] },
+        { model: 'meta-llama/llama-3.3-70b-instruct:free', plugins: [] },
+        { model: 'meta-llama/llama-3.2-3b-instruct:free', plugins: [] },
       ],
       messages: [
         {
@@ -47,7 +52,12 @@ export async function checkChatGPT(
       const msg = res.data?.error?.message || `HTTP ${res.status}`;
       return {
         ...baseResult,
-        rawPayload: { error: msg, data: res.data, modelUsed: res.modelUsed },
+        rawPayload: {
+          error: msg + ' (last model: ' + res.modelUsed + ')',
+          data: res.data,
+          modelUsed: res.modelUsed,
+          attempts: res.attempts,
+        },
       };
     }
 

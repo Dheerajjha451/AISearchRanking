@@ -5,10 +5,10 @@ import { extractToolsFromPayload, findToolMatch } from '@/lib/ranking/tools';
 /**
  * Gemini Adapter — via OpenRouter
  *
- * Uses the latest Gemini candidates first, then free Gemini
- * fallback models if the latest model fails.
+ * Uses the latest Gemini candidates first, then current free
+ * Google fallback models if the latest model fails.
  *
- * Primary model: google/gemini-3.1-pro-preview
+ * Primary model: google/gemini-3.5-flash
  */
 export async function checkGemini(
   query: string,
@@ -27,12 +27,16 @@ export async function checkGemini(
     const res = await openRouterChatWithFallback({
       apiKey,
       models: [
-        'google/gemini-3.1-pro-preview',
-        'google/gemini-3-flash-preview',
+        'google/gemini-3.5-flash',
+        'google/gemini-3.1-flash-lite',
         'google/gemini-2.5-pro',
-        'google/gemini-2.0-flash-exp:free',
-        'google/gemini-1.5-flash:free',
-        'google/gemini-1.5-pro:free',
+        { model: 'google/gemma-4-31b-it:free', plugins: [] },
+        { model: 'google/gemma-4-26b-a4b-it:free', plugins: [] },
+        { model: 'openai/gpt-oss-120b:free', plugins: [] },
+        { model: 'openai/gpt-oss-20b:free', plugins: [] },
+        { model: 'qwen/qwen3-next-80b-a3b-instruct:free', plugins: [] },
+        { model: 'meta-llama/llama-3.3-70b-instruct:free', plugins: [] },
+        { model: 'meta-llama/llama-3.2-3b-instruct:free', plugins: [] },
       ],
       messages: [
         {
@@ -50,7 +54,12 @@ export async function checkGemini(
       const msg = res.data?.error?.message || `HTTP ${res.status}`;
       return {
         ...baseResult,
-        rawPayload: { error: msg, data: res.data, modelUsed: res.modelUsed },
+        rawPayload: {
+          error: msg + ' (last model: ' + res.modelUsed + ')',
+          data: res.data,
+          modelUsed: res.modelUsed,
+          attempts: res.attempts,
+        },
       };
     }
 

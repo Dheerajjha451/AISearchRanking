@@ -3,6 +3,20 @@ type OpenRouterChatResponse = {
   error?: { message?: string; code?: number };
 };
 
+type OpenRouterModelFallback =
+  | string
+  | {
+      model: string;
+      plugins?: Array<{ id: string }>;
+    };
+
+function normalizeModelFallback(model: OpenRouterModelFallback): {
+  model: string;
+  plugins?: Array<{ id: string }>;
+} {
+  return typeof model === 'string' ? { model } : model;
+}
+
 export async function openRouterChatCompletion(options: {
   apiKey: string;
   model: string;
@@ -38,21 +52,32 @@ export async function openRouterChatCompletion(options: {
  */
 export async function openRouterChatWithFallback(options: {
   apiKey: string;
-  models: string[];
+  models: OpenRouterModelFallback[];
   messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>;
-}): Promise<{ modelUsed: string; ok: boolean; status: number; data: OpenRouterChatResponse | null }>{
+}): Promise<{
+  modelUsed: string;
+  ok: boolean;
+  status: number;
+  data: OpenRouterChatResponse | null;
+  attempts?: Array<{ model: string; status: number; error: string }>;
+}>{
   let last: { ok: boolean; status: number; data: OpenRouterChatResponse | null } | null = null;
-  for (const model of options.models) {
+  const attempts: Array<{ model: string; status: number; error: string }> = [];
+  for (const modelOption of options.models) {
+    const { model, plugins } = normalizeModelFallback(modelOption);
     const res = await openRouterChatCompletion({
       apiKey: options.apiKey,
       model,
+      plugins,
       messages: options.messages,
     });
     last = res;
-    if (res.ok) return { modelUsed: model, ...res };
+    if (res.ok) return { modelUsed: model, ...res, attempts };
+
+    const msg = res.data?.error?.message || `HTTP ${res.status}`;
+    attempts.push({ model, status: res.status, error: msg });
 
     // If OpenRouter says no endpoints for this model, try next.
-    const msg = res.data?.error?.message ?? '';
     if (res.status === 404 || msg.toLowerCase().includes('no endpoints found')) {
       continue;
     }
@@ -60,5 +85,7 @@ export async function openRouterChatWithFallback(options: {
     // Other errors likely won't be fixed by switching model, but we still try next just in case.
   }
 
-  return { modelUsed: options.models[options.models.length - 1] ?? 'unknown', ...(last ?? { ok: false, status: 500, data: null }) };
+  const lastModel = options.models[options.models.length - 1];
+  const modelUsed = lastModel ? normalizeModelFallback(lastModel).model : 'unknown';
+  return { modelUsed, ...(last ?? { ok: false, status: 500, data: null }), attempts };
 }

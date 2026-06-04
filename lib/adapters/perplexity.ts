@@ -29,9 +29,14 @@ export async function checkPerplexity(
       models: [
         'perplexity/sonar-pro',
         'perplexity/sonar',
-        'meta-llama/llama-4-maverick:free',
-        'meta-llama/llama-3.1-70b-instruct:free',
-        'qwen/qwen2.5-72b-instruct:free',
+        // Free slugs rotate frequently; keep current resilient fallbacks.
+        { model: 'qwen/qwen3-next-80b-a3b-instruct:free', plugins: [] },
+        { model: 'openai/gpt-oss-120b:free', plugins: [] },
+        { model: 'openai/gpt-oss-20b:free', plugins: [] },
+        { model: 'google/gemma-4-31b-it:free', plugins: [] },
+        { model: 'google/gemma-4-26b-a4b-it:free', plugins: [] },
+        { model: 'meta-llama/llama-3.3-70b-instruct:free', plugins: [] },
+        { model: 'meta-llama/llama-3.2-3b-instruct:free', plugins: [] },
       ],
       messages: [
         {
@@ -49,7 +54,12 @@ export async function checkPerplexity(
       const msg = res.data?.error?.message || `HTTP ${res.status}`;
       return {
         ...baseResult,
-        rawPayload: { error: msg, data: res.data, modelUsed: res.modelUsed },
+        rawPayload: {
+          error: msg + ' (last model: ' + res.modelUsed + ')',
+          data: res.data,
+          modelUsed: res.modelUsed,
+          attempts: res.attempts,
+        },
       };
     }
 
