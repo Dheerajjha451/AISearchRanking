@@ -5,10 +5,10 @@ import { extractToolsFromPayload, findToolMatch } from '@/lib/ranking/tools';
 /**
  * Perplexity Adapter — via OpenRouter
  *
- * Uses an OpenRouter free model with web plugin to simulate
- * Perplexity-like web-grounded results.
+ * Uses Perplexity Sonar first, then free web-capable fallback
+ * models if the Perplexity model fails.
  *
- * Model: meta-llama/llama-4-maverick:free
+ * Primary model: perplexity/sonar-pro
  */
 export async function checkPerplexity(
   query: string,
@@ -27,11 +27,11 @@ export async function checkPerplexity(
     const res = await openRouterChatWithFallback({
       apiKey,
       models: [
-        // Slugs rotate frequently; keep a couple of resilient fallbacks.
+        'perplexity/sonar-pro',
+        'perplexity/sonar',
         'meta-llama/llama-4-maverick:free',
         'meta-llama/llama-3.1-70b-instruct:free',
         'qwen/qwen2.5-72b-instruct:free',
-        'openrouter/auto',
       ],
       messages: [
         {

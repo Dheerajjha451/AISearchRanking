@@ -5,9 +5,10 @@ import { extractToolsFromPayload, findToolMatch } from '@/lib/ranking/tools';
 /**
  * Gemini Adapter — via OpenRouter
  *
- * Uses OpenRouter free Gemini model with web plugin.
+ * Uses the latest Gemini candidates first, then free Gemini
+ * fallback models if the latest model fails.
  *
- * Model: google/gemini-2.0-flash-exp:free
+ * Primary model: google/gemini-3.1-pro-preview
  */
 export async function checkGemini(
   query: string,
@@ -26,10 +27,12 @@ export async function checkGemini(
     const res = await openRouterChatWithFallback({
       apiKey,
       models: [
+        'google/gemini-3.1-pro-preview',
+        'google/gemini-3-flash-preview',
+        'google/gemini-2.5-pro',
         'google/gemini-2.0-flash-exp:free',
         'google/gemini-1.5-flash:free',
         'google/gemini-1.5-pro:free',
-        'openrouter/auto',
       ],
       messages: [
         {

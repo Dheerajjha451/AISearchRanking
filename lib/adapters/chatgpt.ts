@@ -5,10 +5,10 @@ import { extractToolsFromPayload, findToolMatch } from '@/lib/ranking/tools';
 /**
  * ChatGPT Adapter — via OpenRouter
  *
- * Uses OpenRouter free models with web plugin to approximate
- * ChatGPT search ranking behavior.
+ * Uses OpenRouter's latest OpenAI GPT alias first, then free
+ * OpenAI-compatible fallback models if the latest model fails.
  *
- * Model: openai/gpt-4.1-nano:free
+ * Primary model: ~openai/gpt-latest
  */
 export async function checkChatGPT(
   query: string,
@@ -27,9 +27,9 @@ export async function checkChatGPT(
     const res = await openRouterChatWithFallback({
       apiKey,
       models: [
-        'openai/gpt-4.1-nano:free',
         '~openai/gpt-latest',
-        'openrouter/auto',
+        'openai/gpt-4.1-nano:free',
+        'openai/gpt-oss-20b:free',
       ],
       messages: [
         {
