@@ -18,8 +18,8 @@ export default function NavLink({ href, icon, children }: NavLinkProps) {
     <Link
       href={href}
       className={`
-        flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium
-        transition-all duration-200
+        flex shrink-0 items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 rounded-xl text-sm font-medium
+        transition-all duration-200 whitespace-nowrap
         ${
           isActive
             ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'

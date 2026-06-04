@@ -72,7 +72,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold text-white">AI Ranking Monitor</h1>
         <p className="text-sm text-gray-500">

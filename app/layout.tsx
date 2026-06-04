@@ -29,9 +29,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex">
+      <body className="min-h-full flex flex-col md:flex-row">
         <Sidebar />
-        <main className="flex-1 min-h-screen overflow-auto">
+        <main className="flex-1 min-h-screen min-w-0 overflow-auto">
           <div className="animate-fade-in">{children}</div>
         </main>
       </body>
