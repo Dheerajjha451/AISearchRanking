@@ -134,9 +134,7 @@ export async function runRankingCheck(): Promise<RunSummary> {
           return;
         }
 
-        console.log(
-          `[Orchestrator] Checking ${providerName} for "${query.search_text}" → ${product.primary_domain}`
-        );
+
 
         const result = await adapter(query.search_text, product.primary_domain, apiKey);
 
