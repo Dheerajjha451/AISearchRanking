@@ -173,11 +173,6 @@ export default function DashboardPage() {
                   <span className="text-sm font-semibold" style={{ color: config.color }}>
                     {config.label}
                   </span>
-                  {result.modelUsed && (
-                    <span className="ml-auto text-[11px] text-gray-600 truncate max-w-[150px]">
-                      {result.modelUsed}
-                    </span>
-                  )}
                 </div>
 
                 {result.error ? (
