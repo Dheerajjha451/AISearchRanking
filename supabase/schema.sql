@@ -8,11 +8,15 @@ CREATE TABLE IF NOT EXISTS providers (
 
 -- Seed providers
 INSERT INTO providers (name) VALUES
-  ('openai/gpt-oss-120b:free'),
-  ('tencent/hy3:free'),
+  ('openai/gpt-oss-120b'),
   ('openai/gpt-oss-20b:free'),
+  ('google/gemma-4-31b-it:free'),
+  ('google/gemma-4-26b-a4b-it:free'),
+  ('nvidia/nemotron-3-ultra-550b-a55b:free'),
   ('nvidia/nemotron-3-nano-30b-a3b:free'),
-  ('nvidia/nemotron-3-super-120b-a12b:free')
+  ('nvidia/nemotron-3-super-120b-a12b:free'),
+  ('poolside/laguna-xs-2.1:free'),
+  ('cohere/north-mini-code:free')
 ON CONFLICT (name) DO NOTHING;
 
 -- 2. Products

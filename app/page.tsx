@@ -5,10 +5,10 @@ import Card from '@/components/atoms/Card';
 import Button from '@/components/atoms/Button';
 import Input from '@/components/atoms/Input';
 import type { RankedTool } from '@/lib/ranking/tools';
-import { DEFAULT_FREE_MODEL_IDS, FREE_MODELS, getFreeModel, type FreeModelId } from '@/lib/models/free-models';
+import { DEFAULT_MODEL_IDS, OPENROUTER_MODELS, getOpenRouterModel, type OpenRouterModelId } from '@/lib/models/free-models';
 
 type SearchResult = {
-  model: FreeModelId;
+  model: OpenRouterModelId;
   appears: boolean;
   rank: number | null;
   url: string | null;
@@ -27,7 +27,7 @@ export default function DashboardPage() {
   const [query, setQuery] = useState('');
   const [product, setProduct] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [selectedModels, setSelectedModels] = useState<FreeModelId[]>(DEFAULT_FREE_MODEL_IDS);
+  const [selectedModels, setSelectedModels] = useState<OpenRouterModelId[]>(DEFAULT_MODEL_IDS);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
@@ -66,7 +66,7 @@ export default function DashboardPage() {
     }
   };
 
-  const toggleModel = (modelId: FreeModelId) => {
+  const toggleModel = (modelId: OpenRouterModelId) => {
     setSelectedModels((current) =>
       current.includes(modelId) ? current.filter((id) => id !== modelId) : [...current, modelId]
     );
@@ -112,10 +112,10 @@ export default function DashboardPage() {
           </div>
 
           <fieldset>
-            <legend className="text-sm font-medium text-gray-300">Free OpenRouter models</legend>
-            <p className="mt-1 text-xs text-gray-500">Choose one or more models to compare. Requests use their free endpoints only.</p>
+            <legend className="text-sm font-medium text-gray-300">OpenRouter models</legend>
+            <p className="mt-1 text-xs text-gray-500">Choose one or more models to compare. GPT OSS 120B is paid; every other listed model uses its free endpoint.</p>
             <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
-              {FREE_MODELS.map((model) => {
+              {OPENROUTER_MODELS.map((model) => {
                 const selected = selectedModels.includes(model.id);
                 return (
                   <label
@@ -132,7 +132,7 @@ export default function DashboardPage() {
                     />
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-medium text-gray-100">{model.label}</span>
-                      <span className="block truncate text-xs text-gray-500">{model.brand} · {model.id}</span>
+                      <span className="block truncate text-xs text-gray-500">{model.brand} · {model.access === 'paid' ? 'Paid' : 'Free'} · {model.id}</span>
                     </span>
                   </label>
                 );
@@ -151,7 +151,7 @@ export default function DashboardPage() {
       {searched && !error && results.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {results.map((result) => {
-            const config = getFreeModel(result.model) ?? {
+            const config = getOpenRouterModel(result.model) ?? {
               label: result.model,
               color: '#9ca3af',
               bgColor: 'rgba(156,163,175,0.1)',
@@ -187,7 +187,7 @@ export default function DashboardPage() {
       {searched && !error && results.length > 0 && (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           {results.map((result) => {
-            const config = getFreeModel(result.model) ?? {
+            const config = getOpenRouterModel(result.model) ?? {
               label: result.model,
               color: '#9ca3af',
               bgColor: 'rgba(156,163,175,0.1)',

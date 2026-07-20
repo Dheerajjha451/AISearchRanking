@@ -2,7 +2,7 @@ import type { ProviderResult } from '@/lib/types';
 import { extractToolsFromPayload, findToolMatch } from '@/lib/ranking/tools';
 import { openRouterChatCompletion } from './openrouter';
 
-/** Runs one explicitly selected OpenRouter free model, without paid plugins or fallbacks. */
+/** Runs one explicitly selected OpenRouter model, without paid plugins or fallbacks. */
 export async function checkFreeModel(
   model: string,
   query: string,

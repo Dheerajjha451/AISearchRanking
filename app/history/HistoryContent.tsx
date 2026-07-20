@@ -4,7 +4,7 @@ import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/atoms/Card';
 import Button from '@/components/atoms/Button';
-import { getFreeModel } from '@/lib/models/free-models';
+import { getOpenRouterModel } from '@/lib/models/free-models';
 import type { SearchHistory, SearchHistoryResult } from '@/lib/types';
 
 const dateFormatter = new Intl.DateTimeFormat('en', {
@@ -104,7 +104,7 @@ export default function HistoryContent({ history, error }: HistoryContentProps) 
                     {entry.results.map((result) => {
                       const resultId = result.model ?? result.provider ?? 'Unknown model';
                       const config =
-                        (result.model ? getFreeModel(result.model) : undefined) ??
+                        (result.model ? getOpenRouterModel(result.model) : undefined) ??
                         legacyProviderConfig[resultId] ?? {
                           label: resultId,
                           color: '#9ca3af',
