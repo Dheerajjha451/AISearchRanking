@@ -28,14 +28,3 @@ export async function createQuery(
   if (error) throw new Error(`Failed to create query: ${error.message}`);
   return data;
 }
-
-/** Delete a query by ID */
-export async function deleteQuery(queryId: string): Promise<void> {
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from('queries')
-    .delete()
-    .eq('id', queryId);
-
-  if (error) throw new Error(`Failed to delete query: ${error.message}`);
-}

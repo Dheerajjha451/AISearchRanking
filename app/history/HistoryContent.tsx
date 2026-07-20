@@ -31,6 +31,10 @@ function getRankLabel(result: SearchHistoryResult, hasProduct: boolean): string 
   return 'Not in top 10';
 }
 
+function getToolKey(tool: SearchHistoryResult['tools'][number]): string {
+  return `${tool.name}\u0000${tool.url ?? ''}`;
+}
+
 function RefreshButton() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -105,7 +109,9 @@ export default function HistoryContent({ history, error }: HistoryContentProps) 
                           label: resultId,
                           color: '#9ca3af',
                         };
-                      const tools = result.tools.slice(0, 3);
+                      const tools = Array.from(
+                        new Map(result.tools.slice(0, 3).map((tool) => [getToolKey(tool), tool])).values()
+                      );
 
                       return (
                         <div
@@ -135,7 +141,7 @@ export default function HistoryContent({ history, error }: HistoryContentProps) 
                           ) : tools.length > 0 ? (
                             <ol className="space-y-1.5">
                               {tools.map((tool, index) => (
-                                <li key={`${tool.name}-${tool.url || index}`} className="flex gap-2 text-xs">
+                                <li key={getToolKey(tool)} className="flex gap-2 text-xs">
                                   <span className="w-4 shrink-0 text-right font-mono text-gray-600">{index + 1}.</span>
                                   <div className="min-w-0 flex-1">
                                     <p className="truncate font-medium text-gray-200">{tool.name}</p>

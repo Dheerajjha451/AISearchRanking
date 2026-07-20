@@ -1,27 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import type { DbResult, ResultWithMeta } from '@/lib/types';
-
-/** Insert a single result row */
-export async function insertResult(result: {
-  run_id: string;
-  product_id: string;
-  query_id: string;
-  provider_id: string;
-  appears: boolean;
-  rank: number | null;
-  url: string | null;
-  raw_payload: unknown;
-}): Promise<DbResult> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('results')
-    .insert(result)
-    .select()
-    .single();
-
-  if (error) throw new Error(`Failed to insert result: ${error.message}`);
-  return data;
-}
+import type { ResultWithMeta } from '@/lib/types';
 
 /**
  * Fetch recent results for a product + query combination,
@@ -76,25 +54,4 @@ export async function getResultsForProductQuery(
       provider_name: (providers?.name as string) ?? '',
     } as ResultWithMeta;
   });
-}
-
-/**
- * Fetch the latest result per provider for a given product + query.
- * Returns one row per provider (the most recent).
- */
-export async function getLatestResultsPerProvider(
-  productId: string,
-  queryId: string
-): Promise<ResultWithMeta[]> {
-  const allResults = await getResultsForProductQuery(productId, queryId, undefined, 100);
-
-  // Group by provider and pick the latest per provider
-  const latestByProvider = new Map<string, ResultWithMeta>();
-  for (const result of allResults) {
-    if (!latestByProvider.has(result.provider_name)) {
-      latestByProvider.set(result.provider_name, result);
-    }
-  }
-
-  return Array.from(latestByProvider.values());
 }

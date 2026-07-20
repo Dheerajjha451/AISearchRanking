@@ -28,14 +28,3 @@ export async function createProduct(
   if (error) throw new Error(`Failed to create product: ${error.message}`);
   return data;
 }
-
-/** Delete a product by ID */
-export async function deleteProduct(productId: string): Promise<void> {
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from('products')
-    .delete()
-    .eq('id', productId);
-
-  if (error) throw new Error(`Failed to delete product: ${error.message}`);
-}

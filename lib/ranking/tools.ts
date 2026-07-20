@@ -12,6 +12,24 @@ function stripCodeFence(content: string): string {
   return content.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
 }
 
+function normalizeTools(tools: ToolLike[]): RankedTool[] {
+  const normalizedTools: RankedTool[] = [];
+
+  for (const tool of tools) {
+    const normalizedTool = {
+      name: typeof tool.name === 'string' ? tool.name.trim() : '',
+      url: typeof tool.url === 'string' ? tool.url.trim() : '',
+    };
+
+    if (!normalizedTool.name && !normalizedTool.url) continue;
+
+    normalizedTools.push(normalizedTool);
+    if (normalizedTools.length === 10) break;
+  }
+
+  return normalizedTools;
+}
+
 function parseToolsJson(content: string): RankedTool[] {
   const clean = stripCodeFence(content);
   const candidates = [
@@ -24,13 +42,7 @@ function parseToolsJson(content: string): RankedTool[] {
       const parsed = JSON.parse(candidate) as { tools?: ToolLike[] };
       if (!Array.isArray(parsed.tools)) continue;
 
-      return parsed.tools
-        .map((tool) => ({
-          name: typeof tool.name === 'string' ? tool.name.trim() : '',
-          url: typeof tool.url === 'string' ? tool.url.trim() : '',
-        }))
-        .filter((tool) => tool.name || tool.url)
-        .slice(0, 10);
+      return normalizeTools(parsed.tools);
     } catch {
       // Try the next candidate shape.
     }
@@ -65,13 +77,7 @@ export function extractToolsFromPayload(payload: unknown): RankedTool[] {
 
   const record = payload as Record<string, unknown>;
   if (Array.isArray(record.tools)) {
-    return (record.tools as ToolLike[])
-      .map((tool) => ({
-        name: typeof tool.name === 'string' ? tool.name.trim() : '',
-        url: typeof tool.url === 'string' ? tool.url.trim() : '',
-      }))
-      .filter((tool) => tool.name || tool.url)
-      .slice(0, 10);
+    return normalizeTools(record.tools as ToolLike[]);
   }
 
   const content = getContentFromPayload(payload);
