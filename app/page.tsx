@@ -4,6 +4,7 @@ import { FormEvent, useState } from 'react';
 import Card from '@/components/atoms/Card';
 import Button from '@/components/atoms/Button';
 import Input from '@/components/atoms/Input';
+import FailureCard from '@/components/atoms/FailureCard';
 import type { RankedTool } from '@/lib/ranking/tools';
 import { DEFAULT_MODEL_IDS, OPENROUTER_MODELS, getOpenRouterModel, type OpenRouterModelId } from '@/lib/models/free-models';
 
@@ -53,14 +54,14 @@ export default function DashboardPage() {
 
       if (!response.ok) {
         setResults([]);
-        setError(data.error || 'Search failed');
+        setError(data.error || 'We couldn\'t run the visibility check. Please try again.');
         return;
       }
 
       setResults(data.results ?? []);
     } catch {
       setResults([]);
-      setError('Search failed. Check your API key and server logs.');
+      setError('We couldn\'t run the visibility check. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -159,9 +160,7 @@ export default function DashboardPage() {
       </Card>
 
       {error && (
-        <Card padding="sm" className="border-[#f4f1e8]">
-          <p className="text-sm text-[#f4f1e8]">{error}</p>
-        </Card>
+        <FailureCard title="We couldn&apos;t run this check." message={error} label="Search unavailable" />
       )}
 
       {searched && !error && results.length > 0 && (
@@ -220,7 +219,10 @@ export default function DashboardPage() {
                 </div>
 
                 {result.error ? (
-                  <p className="px-2 py-4 text-xs text-[#f4f1e8]">{result.error}</p>
+                  <div className="border border-[#f4f1e8]/[0.16] px-3 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#f4f1e8]">Model unavailable</p>
+                    <p className="mt-2 text-xs leading-5 text-[#f4f1e8]/60">This model could not return recommendations for this query.</p>
+                  </div>
                 ) : result.tools.length > 0 ? (
                   <ol className="space-y-1.5">
                     {result.tools.map((tool, index) => {

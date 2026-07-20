@@ -7,8 +7,8 @@ export async function GET() {
     const queries = await getQueries();
     return NextResponse.json({ queries });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error('[Queries API] Failed to load queries:', error);
+    return NextResponse.json({ error: 'Failed to load queries. Please try again.' }, { status: 500 });
   }
 }
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const query = await createQuery(label, search_text);
     return NextResponse.json({ query }, { status: 201 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error('[Queries API] Failed to create query:', error);
+    return NextResponse.json({ error: 'Failed to save the query. Please try again.' }, { status: 500 });
   }
 }

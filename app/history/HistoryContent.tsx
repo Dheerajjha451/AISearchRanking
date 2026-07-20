@@ -4,6 +4,7 @@ import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/atoms/Card';
 import Button from '@/components/atoms/Button';
+import FailureCard from '@/components/atoms/FailureCard';
 import { getOpenRouterModel } from '@/lib/models/free-models';
 import type { SearchHistory, SearchHistoryResult } from '@/lib/types';
 
@@ -64,9 +65,7 @@ export default function HistoryContent({ history, error }: HistoryContentProps) 
       </div>
 
       {error && (
-        <Card padding="sm" className="border-[#f4f1e8]">
-          <p className="text-sm text-[#f4f1e8]">{error}</p>
-        </Card>
+        <FailureCard title="We couldn&apos;t load your history." message={error} label="History unavailable" />
       )}
 
       {!error && history.length === 0 && (
@@ -131,7 +130,10 @@ export default function HistoryContent({ history, error }: HistoryContentProps) 
                           </div>
 
                           {result.error ? (
-                            <p className="text-xs text-[#f4f1e8]">{result.error}</p>
+                            <div className="border border-[#f4f1e8]/[0.16] px-3 py-4">
+                              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#f4f1e8]">Model unavailable</p>
+                              <p className="mt-2 text-xs leading-5 text-[#f4f1e8]/60">This model could not return recommendations for this search.</p>
+                            </div>
                           ) : tools.length > 0 ? (
                             <ol className="space-y-1.5">
                               {tools.map((tool, index) => (

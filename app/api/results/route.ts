@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ results });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error('[Results API] Failed to load results:', error);
+    return NextResponse.json({ error: 'Failed to load results. Please try again.' }, { status: 500 });
   }
 }

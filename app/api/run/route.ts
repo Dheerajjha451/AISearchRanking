@@ -15,8 +15,8 @@ export async function POST() {
     const summary = await runRankingCheck();
     return NextResponse.json({ summary });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error('[Run API] Ranking check failed:', error);
+    return NextResponse.json({ error: 'Failed to run the ranking check. Please try again.' }, { status: 500 });
   }
 }
 

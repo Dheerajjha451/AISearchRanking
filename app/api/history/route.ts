@@ -6,7 +6,7 @@ export async function GET() {
     const history = await getSearchHistory();
     return NextResponse.json({ history });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('[History API] Request failed:', error);
+    return NextResponse.json({ error: 'Failed to load history. Please try again.' }, { status: 500 });
   }
 }

@@ -26,7 +26,7 @@ const navItems = [
 
 export default function Sidebar() {
   return (
-    <aside className="sticky top-0 z-30 w-full border-b border-[#f4f1e8]/[0.16] bg-[#080808] md:static md:w-72 md:shrink-0 md:border-b-0 md:border-r md:flex md:min-h-screen md:flex-col">
+    <aside className="sticky top-0 z-30 w-full border-b border-[#f4f1e8]/[0.16] bg-[#080808] md:fixed md:inset-y-0 md:left-0 md:w-72 md:border-b-0 md:border-r md:flex md:flex-col">
       {/* Brand */}
       <div className="px-4 py-3 md:px-6 md:py-6 md:border-b md:border-[#f4f1e8]/[0.16]">
         <div className="flex items-center gap-3">
@@ -48,15 +48,6 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-
-      {/* Footer */}
-      <div className="hidden px-6 py-5 border-t border-[#f4f1e8]/[0.16] md:block">
-        <p className="eyebrow mb-2">Workspace status</p>
-        <div className="flex items-center gap-2 text-xs text-[#f4f1e8]/65">
-          <span className="h-2 w-2 bg-[#f4f1e8]" />
-          OpenRouter connected
-        </div>
-      </div>
     </aside>
   );
 }

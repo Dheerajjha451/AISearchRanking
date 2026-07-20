@@ -7,8 +7,8 @@ export async function GET() {
     const products = await getProducts();
     return NextResponse.json({ products });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error('[Products API] Failed to load products:', error);
+    return NextResponse.json({ error: 'Failed to load products. Please try again.' }, { status: 500 });
   }
 }
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const product = await createProduct(name, primary_domain);
     return NextResponse.json({ product }, { status: 201 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error('[Products API] Failed to create product:', error);
+    return NextResponse.json({ error: 'Failed to save the product. Please try again.' }, { status: 500 });
   }
 }

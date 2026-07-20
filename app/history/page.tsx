@@ -9,7 +9,8 @@ export default async function HistoryPage() {
   try {
     history = await getSearchHistory();
   } catch (caughtError) {
-    error = caughtError instanceof Error ? caughtError.message : 'Failed to load history';
+    console.error('[History] Failed to load search history:', caughtError);
+    error = 'Failed to load history. Please try again.';
   }
 
   return <HistoryContent history={history} error={error} />;

@@ -32,14 +32,22 @@ export async function POST(request: Request) {
 
     if (!apiKey) {
       return NextResponse.json(
-        { error: 'No OpenRouter API key configured. Set OPENROUTER_API_KEY in your environment.' },
-        { status: 400 }
+        { error: 'Search is temporarily unavailable. Please try again later.' },
+        { status: 503 }
       );
     }
 
     const results = await Promise.all(
       models.map(async (model) => {
         const result = await checkFreeModel(model, query, product, apiKey);
+        const modelError =
+          result.rawPayload && typeof result.rawPayload === 'object'
+            ? (result.rawPayload as { error?: unknown }).error ?? null
+            : null;
+
+        if (modelError) {
+          console.error(`[Search] Model request failed for ${model}:`, modelError);
+        }
 
         return {
           model,
@@ -51,10 +59,7 @@ export async function POST(request: Request) {
             result.rawPayload && typeof result.rawPayload === 'object'
               ? (result.rawPayload as { modelUsed?: unknown }).modelUsed ?? null
               : null,
-          error:
-            result.rawPayload && typeof result.rawPayload === 'object'
-              ? (result.rawPayload as { error?: unknown }).error ?? null
-              : null,
+          error: modelError ? 'Model unavailable' : null,
         };
       })
     );
@@ -76,7 +81,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ query, product, models, results });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('[Search] Request failed:', error);
+    return NextResponse.json(
+      { error: 'We couldn\'t run the visibility check. Please try again.' },
+      { status: 500 }
+    );
   }
 }
