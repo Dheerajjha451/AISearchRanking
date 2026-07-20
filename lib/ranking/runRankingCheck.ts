@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server';
 import { checkFreeModel } from '@/lib/adapters/free-model';
 import { getOpenRouterApiKey } from '@/lib/config/api-keys';
-import { OPENROUTER_MODELS, isOpenRouterModelId } from '@/lib/models/free-models';
+import { RANKING_OPENROUTER_MODELS, isRankingOpenRouterModelId } from '@/lib/models/free-models';
 import type { DbProduct, DbQuery, DbProvider, RunSummary } from '@/lib/types';
 
 /** Concurrency limiter — simple semaphore */
@@ -63,7 +63,7 @@ export async function runRankingCheck(): Promise<RunSummary> {
     const [productsRes, queriesRes, providersRes] = await Promise.all([
       supabase.from('products').select('*'),
       supabase.from('queries').select('*'),
-      supabase.from('providers').select('*').in('name', OPENROUTER_MODELS.map((model) => model.id)),
+      supabase.from('providers').select('*').in('name', RANKING_OPENROUTER_MODELS.map((model) => model.id)),
     ]);
 
     const products: DbProduct[] = productsRes.data ?? [];
@@ -105,7 +105,7 @@ export async function runRankingCheck(): Promise<RunSummary> {
       await semaphore.acquire();
       try {
         const model = provider.name;
-        if (!isOpenRouterModelId(model)) {
+        if (!isRankingOpenRouterModelId(model)) {
           const msg = `Unsupported OpenRouter model in providers table: ${model}`;
           errors.push(msg);
           errorCount++;

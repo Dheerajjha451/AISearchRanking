@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { checkFreeModel } from '@/lib/adapters/free-model';
 import { getOpenRouterApiKey } from '@/lib/config/api-keys';
-import { DEFAULT_MODEL_IDS, isOpenRouterModelId } from '@/lib/models/free-models';
+import { DEFAULT_MODEL_IDS, isRankingOpenRouterModelId } from '@/lib/models/free-models';
 import { extractToolsFromPayload } from '@/lib/ranking/tools';
 import { createAdminClient } from '@/lib/supabase/server';
 type SearchBody = {
@@ -18,14 +18,14 @@ export async function POST(request: Request) {
     const requestedModels = Array.isArray(body.models)
       ? body.models.filter((model): model is string => typeof model === 'string')
       : DEFAULT_MODEL_IDS;
-    const models = [...new Set(requestedModels)].filter(isOpenRouterModelId);
+    const models = [...new Set(requestedModels)].filter(isRankingOpenRouterModelId);
 
     if (!query) {
       return NextResponse.json({ error: 'Search query is required' }, { status: 400 });
     }
 
     if (models.length === 0) {
-      return NextResponse.json({ error: 'Select at least one supported model' }, { status: 400 });
+      return NextResponse.json({ error: 'Select at least one ranking model' }, { status: 400 });
     }
 
     const apiKey = getOpenRouterApiKey();

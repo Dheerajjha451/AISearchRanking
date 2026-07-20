@@ -4,7 +4,7 @@ A Next.js app for checking how free OpenRouter models rank products/tools for a 
 
 ## Features
 
-- Select and compare current free OpenRouter models from OpenAI, Google, NVIDIA, Poolside, and Cohere, plus the paid GPT OSS 120B option
+- Browse the current free OpenRouter catalogue from OpenAI, Google, NVIDIA, Tencent, Poolside, and Cohere; select every chat-capable model for ranking comparisons
 - Optional product/domain rank check against the returned top 10 tools
 - Search history page with previous queries, optional product text, and provider results
 - Supabase-backed storage for products, queries, runs, results, providers, and search history
@@ -81,7 +81,7 @@ npm run build
 
 All provider adapters use the same `OPENROUTER_API_KEY` from the server environment.
 
-Dashboard searches run the model IDs selected in the UI and do not enable OpenRouter's paid web plugin. GPT OSS 120B is a paid selection; the remaining listed models use free endpoints whose availability and rate limits are controlled by OpenRouter.
+Dashboard searches run the free, ranking-capable model IDs selected in the UI and do not enable OpenRouter's paid web plugin. Embedding, reranking, and safety models are shown for reference but disabled because they cannot produce top-10 recommendation lists. Free endpoint availability and rate limits are controlled by OpenRouter.
 
 ## Supabase Tables
 
