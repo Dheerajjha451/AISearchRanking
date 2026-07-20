@@ -26,22 +26,22 @@ const navItems = [
 
 export default function Sidebar() {
   return (
-    <aside className="sticky top-0 z-30 w-full border-b border-white/[0.06] bg-[#060a14]/95 backdrop-blur-xl md:static md:w-64 md:shrink-0 md:border-b-0 md:border-r md:bg-[#060a14] md:flex md:min-h-screen md:flex-col">
+    <aside className="sticky top-0 z-30 w-full border-b border-[#f4f1e8]/[0.16] bg-[#080808] md:static md:w-72 md:shrink-0 md:border-b-0 md:border-r md:flex md:min-h-screen md:flex-col">
       {/* Brand */}
-      <div className="px-4 py-3 md:px-6 md:py-5 md:border-b md:border-white/[0.06]">
+      <div className="px-4 py-3 md:px-6 md:py-6 md:border-b md:border-[#f4f1e8]/[0.16]">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <Image src="/logo.png" alt="AI Ranking Monitor" width={36} height={36} className="h-7 w-7 md:h-8 md:w-8" priority />
+          <div className="flex h-12 w-12 items-center justify-center border border-[#f4f1e8] bg-[#f4f1e8] md:h-16 md:w-16">
+            <Image src="/logo.png" alt="Rankline logo" width={64} height={64} className="h-10 w-10 object-contain md:h-14 md:w-14" priority />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-white tracking-tight">AI Ranking</h1>
-            <p className="text-xs text-gray-500">Monitor</p>
+            <h1 className="display-type text-base font-bold text-[#f4f1e8]">Rankline</h1>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#f4f1e8]/55">AI visibility</p>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex gap-2 overflow-x-auto px-3 pb-3 md:block md:flex-1 md:space-y-1 md:overflow-visible md:py-4">
+      <nav className="flex gap-2 overflow-x-auto px-3 pb-3 md:block md:flex-1 md:space-y-1 md:overflow-visible md:px-4 md:py-6">
         {navItems.map((item) => (
           <NavLink key={item.href} href={item.href} icon={item.icon}>
             {item.label}
@@ -50,10 +50,12 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="hidden px-6 py-4 border-t border-white/[0.06] md:block">
-        <p className="text-xs text-gray-600">
-          AI Ranking Monitor v1.0
-        </p>
+      <div className="hidden px-6 py-5 border-t border-[#f4f1e8]/[0.16] md:block">
+        <p className="eyebrow mb-2">Workspace status</p>
+        <div className="flex items-center gap-2 text-xs text-[#f4f1e8]/65">
+          <span className="h-2 w-2 bg-[#f4f1e8]" />
+          OpenRouter connected
+        </div>
       </div>
     </aside>
   );

@@ -1,16 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0f1a;
-  --foreground: #e2e8f0;
-  --card-bg: rgba(255, 255, 255, 0.03);
-  --border-color: rgba(255, 255, 255, 0.06);
+  --background: #080808;
+  --foreground: #f4f1e8;
+  --muted: rgba(244, 241, 232, 0.62);
+  --card-bg: #101010;
+  --border-color: rgba(244, 241, 232, 0.16);
+  --font-display: "Avenir Next", "Segoe UI Variable Display", "Trebuchet MS", sans-serif;
+  --font-body: "Avenir Next", "Segoe UI Variable", var(--font-geist-sans), system-ui, sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -22,7 +25,31 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
+  letter-spacing: -0.012em;
+}
+
+::selection { background: var(--foreground); color: var(--background); }
+
+* { border-radius: 0 !important; }
+
+.display-type {
+  font-family: var(--font-display);
+  letter-spacing: -0.055em;
+}
+
+.eyebrow {
+  color: var(--foreground);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.workspace-grid {
+  background-image: linear-gradient(rgba(244, 241, 232, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(244, 241, 232, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 /* Smooth page transitions */
@@ -40,7 +67,7 @@ body {
   transition: all 0.3s ease;
 }
 .glass-hover:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(244, 241, 232, 0.06);
+  border-color: rgba(244, 241, 232, 0.28);
   transform: translateY(-1px);
 }

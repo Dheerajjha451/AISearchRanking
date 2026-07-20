@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Ranking Monitor",
+  title: "Rankline — AI Visibility Intelligence",
   description:
     "Compare how free OpenRouter models rank your products across search queries",
 };
@@ -31,7 +31,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col md:flex-row">
         <Sidebar />
-        <main className="flex-1 min-h-screen min-w-0 overflow-auto">
+        <main className="workspace-grid flex-1 min-h-screen min-w-0 overflow-auto">
           <div className="animate-fade-in">{children}</div>
         </main>
       </body>

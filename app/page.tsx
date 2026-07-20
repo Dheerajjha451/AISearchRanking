@@ -73,66 +73,82 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-white">AI Ranking Monitor</h1>
-        <p className="text-sm text-gray-500">
-          Search a topic, see the top 10 AI recommendations, and optionally check your product rank.
-        </p>
-      </div>
+    <div className="mx-auto max-w-7xl space-y-6 p-4 sm:p-6 md:p-10">
+      <header className="relative overflow-hidden border border-[#f4f1e8]/[0.16] bg-[#101010] px-6 py-8 shadow-[0_18px_55px_rgba(0,0,0,0.2)] sm:px-8 sm:py-10">
+        <div className="absolute -right-12 -top-14 h-48 w-48 bg-[#f4f1e8]/[0.06] blur-3xl" />
+        <div className="relative max-w-2xl">
+          <p className="eyebrow mb-4">Search visibility intelligence</p>
+          <h1 className="display-type text-4xl font-bold leading-[0.94] text-[#f4f1e8] sm:text-5xl">Know where AI puts you.</h1>
+          <p className="mt-5 max-w-xl text-sm leading-6 text-[#f4f1e8]/65 sm:text-base">
+            Compare the recommendations users see across leading OpenRouter models, then track whether your product earns a place in the answer.
+          </p>
+        </div>
+        <div className="relative mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#f4f1e8]/65">
+          <span className="flex items-center gap-2"><span className="h-2 w-2 bg-[#f4f1e8]" /> Live model comparison</span>
+          <span className="font-mono text-[#f4f1e8]/45">TOP 10 / MODEL</span>
+        </div>
+      </header>
 
-      <Card>
-        <form onSubmit={handleSearch} className="space-y-4">
+      <Card padding="lg">
+        <form onSubmit={handleSearch} className="space-y-6">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="ranking-query" className="text-sm font-medium text-gray-300">
-              Search text
-            </label>
+            <div className="flex items-center justify-between gap-4">
+              <label htmlFor="ranking-query" className="text-xs font-semibold uppercase tracking-[0.12em] text-[#f4f1e8]/70">
+                The question people ask
+              </label>
+              <span className="hidden text-[11px] text-[#f4f1e8]/40 sm:block">Be specific for a sharper comparison</span>
+            </div>
             <textarea
               id="ranking-query"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Best AI CRM tools for B2B sales teams"
               rows={4}
-              className="w-full resize-none px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all duration-200"
+              className="w-full resize-none border border-[#f4f1e8]/[0.16] bg-[#080808] px-4 py-3.5 text-sm text-[#f4f1e8] placeholder:text-[#f4f1e8]/35 transition-all duration-200 focus:border-[#f4f1e8] focus:outline-none focus:ring-1 focus:ring-[#f4f1e8]"
               required
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-end">
+          <div className="grid grid-cols-1 gap-4 border-y border-[#f4f1e8]/[0.14] py-5 lg:grid-cols-[1fr_auto] lg:items-end">
             <Input
               id="product-check"
-              label="Product name or URL optional"
+              label="Your product (optional)"
               placeholder="HubSpot, hubspot.com, or https://www.hubspot.com/products/crm"
               value={product}
               onChange={(event) => setProduct(event.target.value)}
             />
-            <Button type="submit" loading={loading} className="h-[42px] px-6">
-              {loading ? 'Searching...' : 'Search Rankings'}
+            <Button type="submit" loading={loading} className="h-[46px] px-6 font-semibold">
+              {loading ? 'Analysing...' : 'Run visibility check'}
             </Button>
           </div>
 
           <fieldset>
-            <legend className="text-sm font-medium text-gray-300">OpenRouter models</legend>
-            <p className="mt-1 text-xs text-gray-500">Choose one or more models to compare. GPT OSS 120B is paid; every other listed model uses its free endpoint.</p>
-            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <legend className="text-xs font-semibold uppercase tracking-[0.12em] text-[#f4f1e8]/70">Comparison panel</legend>
+                <p className="mt-1 text-xs text-[#f4f1e8]/45">Choose the models whose recommendations you want to audit.</p>
+              </div>
+              <p className="text-xs font-medium text-[#f4f1e8]">{selectedModels.length} selected</p>
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
               {OPENROUTER_MODELS.map((model) => {
                 const selected = selectedModels.includes(model.id);
                 return (
                   <label
                     key={model.id}
-                    className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${
-                      selected ? 'border-indigo-400/50 bg-indigo-500/10' : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04]'
+                    className={`group flex cursor-pointer items-center gap-3 border px-3.5 py-3 transition-all ${
+                      selected ? 'border-[#f4f1e8] bg-[#f4f1e8]/[0.1]' : 'border-[#f4f1e8]/[0.12] bg-transparent hover:border-[#f4f1e8]/[0.35] hover:bg-[#f4f1e8]/[0.05]'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={selected}
                       onChange={() => toggleModel(model.id)}
-                      className="h-4 w-4 accent-indigo-500"
+                      className="h-4 w-4 accent-[#f4f1e8]"
                     />
                     <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium text-gray-100">{model.label}</span>
-                      <span className="block truncate text-xs text-gray-500">{model.brand} · {model.access === 'paid' ? 'Paid' : 'Free'} · {model.id}</span>
+                      <span className="block truncate text-sm font-semibold text-[#f4f1e8]">{model.label}</span>
+                      <span className="mt-0.5 block truncate font-mono text-[10px] text-[#f4f1e8]/40">{model.brand} · {model.access === 'paid' ? 'Paid' : 'Free'} · {model.id}</span>
                     </span>
                   </label>
                 );
@@ -143,37 +159,34 @@ export default function DashboardPage() {
       </Card>
 
       {error && (
-        <Card padding="sm" className="border-red-500/20 bg-red-500/5">
-          <p className="text-sm text-red-300">{error}</p>
+        <Card padding="sm" className="border-[#f4f1e8]">
+          <p className="text-sm text-[#f4f1e8]">{error}</p>
         </Card>
       )}
 
       {searched && !error && results.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <section className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <p className="eyebrow">Snapshot</p>
+            <p className="text-xs text-[#f4f1e8]/45">{results.length} model responses</p>
+          </div>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           {results.map((result) => {
             const config = getOpenRouterModel(result.model) ?? {
               label: result.model,
-              color: '#9ca3af',
-              bgColor: 'rgba(156,163,175,0.1)',
             };
 
             return (
-              <Card key={result.model} padding="sm">
+              <Card key={result.model} padding="sm" className="glass-hover">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs text-gray-500">Model</p>
-                    <p className="text-sm font-semibold" style={{ color: config.color }}>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-[#f4f1e8]/45">Model</p>
+                    <p className="text-sm font-semibold text-[#f4f1e8]">
                       {config.label}
                     </p>
                   </div>
                   <span
-                    className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                      hasProduct
-                        ? result.appears
-                          ? 'bg-emerald-500/10 text-emerald-300'
-                          : 'bg-amber-500/10 text-amber-300'
-                        : 'bg-white/5 text-gray-300'
-                    }`}
+                    className="border border-[#f4f1e8]/[0.16] px-2.5 py-1 text-xs font-medium text-[#f4f1e8]"
                   >
                     {getRankLabel(result, hasProduct)}
                   </span>
@@ -182,31 +195,32 @@ export default function DashboardPage() {
             );
           })}
         </div>
+        </section>
       )}
 
       {searched && !error && results.length > 0 && (
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <section className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <p className="eyebrow">Recommendation detail</p>
+            <p className="text-xs text-[#f4f1e8]/45">Ranked lists returned by each model</p>
+          </div>
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
           {results.map((result) => {
             const config = getOpenRouterModel(result.model) ?? {
               label: result.model,
-              color: '#9ca3af',
-              bgColor: 'rgba(156,163,175,0.1)',
             };
 
             return (
-              <Card key={result.model} padding="sm">
-                <div
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg mb-3"
-                  style={{ backgroundColor: config.bgColor }}
-                >
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: config.color }} />
-                  <span className="text-sm font-semibold" style={{ color: config.color }}>
+              <Card key={result.model} padding="sm" className="glass-hover">
+                <div className="mb-3 flex items-center gap-2 border-b border-[#f4f1e8]/[0.16] px-1 pb-2.5">
+                  <div className="h-2 w-2 bg-[#f4f1e8]" />
+                  <span className="text-sm font-semibold text-[#f4f1e8]">
                     {config.label}
                   </span>
                 </div>
 
                 {result.error ? (
-                  <p className="text-xs text-red-300 px-2 py-4">{result.error}</p>
+                  <p className="px-2 py-4 text-xs text-[#f4f1e8]">{result.error}</p>
                 ) : result.tools.length > 0 ? (
                   <ol className="space-y-1.5">
                     {result.tools.map((tool, index) => {
@@ -215,20 +229,20 @@ export default function DashboardPage() {
                       return (
                         <li
                           key={`${result.model}-${index}-${tool.url || tool.name}`}
-                          className={`flex items-start gap-2 text-xs py-2 px-2 rounded-lg transition-colors ${
+                          className={`flex items-start gap-2 px-2 py-2 text-xs transition-colors ${
                             isMatch
-                              ? 'bg-emerald-500/10 border border-emerald-500/20'
-                              : 'hover:bg-white/[0.03] border border-transparent'
+                              ? 'border border-[#f4f1e8]/[0.34] bg-[#f4f1e8]/[0.08]'
+                              : 'border border-transparent hover:bg-[#f4f1e8]/[0.05]'
                           }`}
                         >
-                          <span className="text-gray-600 font-mono w-5 shrink-0 text-right">
+                          <span className="w-5 shrink-0 text-right font-mono text-[#f4f1e8]/35">
                             {index + 1}.
                           </span>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-gray-200 font-medium truncate">{tool.name}</span>
+                              <span className="truncate font-medium text-[#f4f1e8]">{tool.name}</span>
                               {isMatch && (
-                                <span className="shrink-0 text-[11px] text-emerald-300">Match</span>
+                                <span className="shrink-0 text-[11px] text-[#f4f1e8]">Match</span>
                               )}
                             </div>
                             {tool.url && (
@@ -236,7 +250,7 @@ export default function DashboardPage() {
                                 href={tool.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="block text-gray-600 hover:text-indigo-400 truncate transition-colors mt-0.5"
+                            className="mt-0.5 block truncate text-[#f4f1e8]/40 transition-colors hover:text-[#f4f1e8]"
                               >
                                 {tool.url}
                               </a>
@@ -247,20 +261,22 @@ export default function DashboardPage() {
                     })}
                   </ol>
                 ) : (
-                  <p className="text-xs text-gray-600 px-2 py-4 text-center">No tools returned</p>
+                  <p className="px-2 py-4 text-center text-xs text-[#f4f1e8]/40">No tools returned</p>
                 )}
               </Card>
             );
           })}
         </div>
+        </section>
       )}
 
       {!searched && (
-        <Card>
-          <div className="text-center py-14">
-            <h2 className="text-lg font-semibold text-white mb-2">Start with a search query</h2>
-            <p className="text-sm text-gray-500 max-w-md mx-auto">
-              The results will compare each selected free model&apos;s top 10 recommendations and your product&apos;s position when it appears.
+        <Card className="border-dashed bg-transparent">
+          <div className="py-14 text-center">
+            <p className="eyebrow mb-3">Ready when you are</p>
+            <h2 className="display-type mb-3 text-2xl font-bold text-[#f4f1e8]">Start with a search query</h2>
+            <p className="mx-auto max-w-md text-sm leading-6 text-[#f4f1e8]/60">
+              The results will compare each selected model&apos;s top recommendations and your product&apos;s position when it appears.
             </p>
           </div>
         </Card>

@@ -18,12 +18,12 @@ export default function NavLink({ href, icon, children }: NavLinkProps) {
     <Link
       href={href}
       className={`
-        flex shrink-0 items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 rounded-xl text-sm font-medium
+        flex shrink-0 items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 text-sm font-medium
         transition-all duration-200 whitespace-nowrap
         ${
           isActive
-            ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
-            : 'text-gray-400 hover:text-white hover:bg-white/5'
+            ? 'bg-[#f4f1e8] text-[#080808] shadow-[0_8px_20px_rgba(0,0,0,0.2)]'
+            : 'text-[#f4f1e8]/60 hover:text-[#f4f1e8] hover:bg-[#f4f1e8]/[0.08]'
         }
       `}
     >
