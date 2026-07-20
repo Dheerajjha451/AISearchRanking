@@ -1,9 +1,9 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import type { DbQuery } from '@/lib/types';
 
 /** Fetch all queries */
 export async function getQueries(): Promise<DbQuery[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('queries')
     .select('*')
@@ -18,7 +18,7 @@ export async function createQuery(
   label: string,
   searchText: string
 ): Promise<DbQuery> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('queries')
     .insert({ label, search_text: searchText })

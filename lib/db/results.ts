@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import type { ResultWithMeta } from '@/lib/types';
 
 /**
@@ -11,7 +11,7 @@ export async function getResultsForProductQuery(
   providerFilter?: string,
   limit = 30
 ): Promise<ResultWithMeta[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   // We use a raw query via RPC or a joined select.
   // Supabase JS supports foreign table references with select syntax.

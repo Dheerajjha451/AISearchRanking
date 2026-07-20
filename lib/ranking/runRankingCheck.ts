@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { checkFreeModel } from '@/lib/adapters/free-model';
 import { getOpenRouterApiKey } from '@/lib/config/api-keys';
 import { FREE_MODELS, isFreeModelId } from '@/lib/models/free-models';
@@ -40,7 +40,7 @@ const CONCURRENCY_LIMIT = 2;
  * 5. Marks run as completed or failed
  */
 export async function runRankingCheck(): Promise<RunSummary> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   // 1. Create a new run
   const { data: run, error: runError } = await supabase

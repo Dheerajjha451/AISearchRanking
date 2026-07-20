@@ -71,6 +71,9 @@ CREATE TABLE IF NOT EXISTS search_history (
 CREATE INDEX IF NOT EXISTS idx_search_history_created_at ON search_history(created_at DESC);
 
 
+-- The application accesses these tables only through server-side code using
+-- SUPABASE_SERVICE_ROLE_KEY. Keep RLS enabled and expose no anon/authenticated
+-- policies; the service role bypasses RLS without being available to browsers.
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE queries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE runs ENABLE ROW LEVEL SECURITY;
@@ -78,10 +81,9 @@ ALTER TABLE results ENABLE ROW LEVEL SECURITY;
 ALTER TABLE providers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE search_history ENABLE ROW LEVEL SECURITY;
 
--- Allow all operations on all tables (no auth, single-tenant)
-CREATE POLICY "Allow all on products" ON products FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all on queries" ON queries FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all on runs" ON runs FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all on results" ON results FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all on providers" ON providers FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all on search_history" ON search_history FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all on products" ON products;
+DROP POLICY IF EXISTS "Allow all on queries" ON queries;
+DROP POLICY IF EXISTS "Allow all on runs" ON runs;
+DROP POLICY IF EXISTS "Allow all on results" ON results;
+DROP POLICY IF EXISTS "Allow all on providers" ON providers;
+DROP POLICY IF EXISTS "Allow all on search_history" ON search_history;

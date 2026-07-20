@@ -18,7 +18,6 @@ A Next.js app for checking how free OpenRouter models rank products/tools for a 
 - Tailwind CSS 4
 - Supabase
 - OpenRouter for model access
-- Recharts for chart components
 
 ## Setup
 
@@ -38,14 +37,13 @@ cp .env.example .env.local
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 OPENROUTER_API_KEY=
 ```
 
 4. Create the Supabase tables by running `supabase/schema.sql` in the Supabase SQL Editor.
 
-The schema enables open RLS policies for a no-auth, single-tenant setup. Do not use this policy model for a public multi-user production app without adding proper auth and access controls.
+Database access runs only on the server with `SUPABASE_SERVICE_ROLE_KEY`. Keep this key private: it bypasses Supabase RLS and must never be exposed through a `NEXT_PUBLIC_` variable.
 
 ## Development
 

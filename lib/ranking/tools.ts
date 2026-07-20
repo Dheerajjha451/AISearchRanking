@@ -104,6 +104,10 @@ function getHostname(value: string): string {
   }
 }
 
+function textIncludes(value: string, search: string): boolean {
+  return value.includes(search);
+}
+
 export function findToolMatch(
   tools: RankedTool[],
   productNeedle: string
@@ -112,22 +116,25 @@ export function findToolMatch(
   if (!normalizedNeedle) return null;
 
   const hostnameNeedle = getHostname(normalizedNeedle);
-  const needles = Array.from(
-    new Set([normalizedNeedle, hostnameNeedle].filter((needle) => needle.length > 1))
-  );
+  const needles = new Set([normalizedNeedle, hostnameNeedle].filter((needle) => needle.length > 1));
 
   const index = tools.findIndex((tool) => {
     const name = normalizeValue(tool.name);
     const url = normalizeValue(tool.url);
     const host = getHostname(tool.url);
 
-    return needles.some(
-      (needle) =>
-        name.includes(needle) ||
-        url.includes(needle) ||
-        host.includes(needle) ||
-        (host.length > 1 && needle.includes(host))
-    );
+    for (const needle of needles) {
+      if (
+        textIncludes(name, needle) ||
+        textIncludes(url, needle) ||
+        textIncludes(host, needle) ||
+        (host.length > 1 && textIncludes(needle, host))
+      ) {
+        return true;
+      }
+    }
+
+    return false;
   });
 
   return index === -1 ? null : { rank: index + 1, tool: tools[index] };

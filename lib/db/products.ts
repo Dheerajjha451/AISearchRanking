@@ -1,9 +1,9 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import type { DbProduct } from '@/lib/types';
 
 /** Fetch all products */
 export async function getProducts(): Promise<DbProduct[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -18,7 +18,7 @@ export async function createProduct(
   name: string,
   primaryDomain: string
 ): Promise<DbProduct> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('products')
     .insert({ name, primary_domain: primaryDomain })

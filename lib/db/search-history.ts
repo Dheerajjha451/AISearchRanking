@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import type { SearchHistory } from '@/lib/types';
 
 export async function getSearchHistory(limit = 100): Promise<SearchHistory[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('search_history')
     .select('*')

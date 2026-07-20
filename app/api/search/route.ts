@@ -3,7 +3,7 @@ import { checkFreeModel } from '@/lib/adapters/free-model';
 import { getOpenRouterApiKey } from '@/lib/config/api-keys';
 import { DEFAULT_FREE_MODEL_IDS, isFreeModelId } from '@/lib/models/free-models';
 import { extractToolsFromPayload } from '@/lib/ranking/tools';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 type SearchBody = {
   query?: unknown;
   product?: unknown;
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     );
 
     try {
-      const supabase = await createClient();
+      const supabase = createAdminClient();
       const { error: historyError } = await supabase.from('search_history').insert({
         query_text: query,
         product_text: product || null,
