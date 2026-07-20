@@ -1,7 +1,7 @@
 'use client';
 
 import NavLink from '@/components/molecules/NavLink';
-import SearchRankLogo from '@/components/atoms/SearchRankLogo';
+import Image from 'next/image';
 
 const navItems = [
   {
@@ -31,7 +31,7 @@ export default function Sidebar() {
       <div className="px-4 py-3 md:px-6 md:py-5 md:border-b md:border-white/[0.06]">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <SearchRankLogo className="w-5 h-5 text-white" />
+            <Image src="/logo.png" alt="AI Ranking Monitor" width={36} height={36} className="h-7 w-7 md:h-8 md:w-8" priority />
           </div>
           <div>
             <h1 className="text-sm font-bold text-white tracking-tight">AI Ranking</h1>
