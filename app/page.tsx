@@ -133,28 +133,24 @@ export default function DashboardPage() {
             </div>
             <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
               {OPENROUTER_MODELS.map((model) => {
-                const canRank = model.capability === 'ranking';
-                const selected = canRank && selectedModels.includes(model.id);
+                const selected = selectedModels.includes(model.id);
                 return (
                   <label
                     key={model.id}
-                    className={`group flex items-center gap-3 border px-3.5 py-3 transition-all ${
-                      canRank ? 'cursor-pointer' : 'cursor-not-allowed opacity-45'
-                    } ${
+                    className={`group flex cursor-pointer items-center gap-3 border px-3.5 py-3 transition-all ${
                       selected ? 'border-[#f4f1e8] bg-[#f4f1e8]/[0.1]' : 'border-[#f4f1e8]/[0.12] bg-transparent hover:border-[#f4f1e8]/[0.35] hover:bg-[#f4f1e8]/[0.05]'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={selected}
-                      disabled={!canRank}
                       onChange={() => toggleModel(model.id)}
                       className="h-4 w-4 accent-[#f4f1e8]"
                     />
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-semibold text-[#f4f1e8]">{model.label}</span>
                       <span className="mt-0.5 block truncate font-mono text-[10px] text-[#f4f1e8]/40">
-                        {model.brand} · Free · {canRank ? 'Ranking' : model.capability} · {model.id}
+                        {model.brand} · Free chat · {model.id}
                       </span>
                     </span>
                   </label>
