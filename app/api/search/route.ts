@@ -1,15 +1,13 @@
 import { NextResponse } from 'next/server';
-import { providerAdapters } from '@/lib/adapters';
+import { checkFreeModel } from '@/lib/adapters/free-model';
 import { getOpenRouterApiKey } from '@/lib/config/api-keys';
+import { DEFAULT_FREE_MODEL_IDS, isFreeModelId } from '@/lib/models/free-models';
 import { extractToolsFromPayload } from '@/lib/ranking/tools';
 import { createClient } from '@/lib/supabase/server';
-import type { ProviderName } from '@/lib/types';
-
-const SEARCH_PROVIDERS: ProviderName[] = ['perplexity', 'chatgpt', 'gemini'];
-
 type SearchBody = {
   query?: unknown;
   product?: unknown;
+  models?: unknown;
 };
 
 export async function POST(request: Request) {
@@ -17,9 +15,17 @@ export async function POST(request: Request) {
     const body = (await request.json().catch(() => ({}))) as SearchBody;
     const query = typeof body.query === 'string' ? body.query.trim() : '';
     const product = typeof body.product === 'string' ? body.product.trim() : '';
+    const requestedModels = Array.isArray(body.models)
+      ? body.models.filter((model): model is string => typeof model === 'string')
+      : DEFAULT_FREE_MODEL_IDS;
+    const models = [...new Set(requestedModels)].filter(isFreeModelId);
 
     if (!query) {
       return NextResponse.json({ error: 'Search query is required' }, { status: 400 });
+    }
+
+    if (models.length === 0) {
+      return NextResponse.json({ error: 'Select at least one supported free model' }, { status: 400 });
     }
 
     const apiKey = getOpenRouterApiKey();
@@ -32,23 +38,11 @@ export async function POST(request: Request) {
     }
 
     const results = await Promise.all(
-      SEARCH_PROVIDERS.map(async (provider) => {
-        const adapter = providerAdapters[provider];
-        if (!adapter) {
-          return {
-            provider,
-            appears: false,
-            rank: null,
-            url: null,
-            tools: [],
-            error: `No adapter configured for ${provider}`,
-          };
-        }
-
-        const result = await adapter(query, product, apiKey);
+      models.map(async (model) => {
+        const result = await checkFreeModel(model, query, product, apiKey);
 
         return {
-          provider,
+          model,
           appears: result.appears,
           rank: result.rank,
           url: result.url ?? null,
@@ -80,7 +74,7 @@ export async function POST(request: Request) {
       console.error('[Search] Failed to save history:', historyError);
     }
 
-    return NextResponse.json({ query, product, results });
+    return NextResponse.json({ query, product, models, results });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });

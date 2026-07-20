@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
-import { providerAdapters } from '@/lib/adapters';
+import { checkFreeModel } from '@/lib/adapters/free-model';
 import { getOpenRouterApiKey } from '@/lib/config/api-keys';
-import type { DbProduct, DbQuery, DbProvider, ProviderName, RunSummary } from '@/lib/types';
+import { FREE_MODELS, isFreeModelId } from '@/lib/models/free-models';
+import type { DbProduct, DbQuery, DbProvider, RunSummary } from '@/lib/types';
 
 /** Concurrency limiter — simple semaphore */
 class Semaphore {
@@ -30,11 +31,11 @@ class Semaphore {
 const CONCURRENCY_LIMIT = 2;
 
 /**
- * Main orchestrator: runs a ranking check across all products × queries × providers.
+ * Main orchestrator: runs a ranking check across all products × queries × free models.
  *
  * 1. Creates a new `runs` row with status='pending'
  * 2. Loads all products, queries, providers, and the OpenRouter API key from env
- * 3. For each (product, query, provider) combination, calls the adapter
+ * 3. For each (product, query, model) combination, calls that free model
  * 4. Inserts result rows
  * 5. Marks run as completed or failed
  */
@@ -62,7 +63,7 @@ export async function runRankingCheck(): Promise<RunSummary> {
     const [productsRes, queriesRes, providersRes] = await Promise.all([
       supabase.from('products').select('*'),
       supabase.from('queries').select('*'),
-      supabase.from('providers').select('*'),
+      supabase.from('providers').select('*').in('name', FREE_MODELS.map((model) => model.id)),
     ]);
 
     const products: DbProduct[] = productsRes.data ?? [];
@@ -103,12 +104,9 @@ export async function runRankingCheck(): Promise<RunSummary> {
     const taskPromises = tasks.map(async ({ product, query, provider }) => {
       await semaphore.acquire();
       try {
-        const providerName = provider.name as ProviderName;
-        const adapter = providerAdapters[providerName];
-        // All supported providers use one shared OpenRouter key from the server environment.
-
-        if (!adapter) {
-          const msg = `No adapter for provider: ${providerName}`;
+        const model = provider.name;
+        if (!isFreeModelId(model)) {
+          const msg = `Unsupported free model in providers table: ${model}`;
           errors.push(msg);
           errorCount++;
           console.error(`[Orchestrator] ${msg}`);
@@ -136,7 +134,7 @@ export async function runRankingCheck(): Promise<RunSummary> {
 
 
 
-        const result = await adapter(query.search_text, product.primary_domain, apiKey);
+        const result = await checkFreeModel(model, query.search_text, product.primary_domain, apiKey);
 
         // Insert result row
         await supabase.from('results').insert({

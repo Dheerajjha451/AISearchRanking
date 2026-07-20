@@ -1,10 +1,10 @@
 # AI Search Ranking Monitor
 
-A Next.js app for checking how AI providers rank products/tools for a search query. The dashboard runs the same query through Perplexity, ChatGPT, and Gemini adapters via OpenRouter, shows the top recommendations, and stores completed searches in History.
+A Next.js app for checking how free OpenRouter models rank products/tools for a search query. The dashboard lets people select models, compares their top recommendations, and stores completed searches in History.
 
 ## Features
 
-- Search one prompt across Perplexity, ChatGPT, and Gemini style adapters
+- Select and compare free OpenRouter models, including GPT OSS and NVIDIA Nemotron options
 - Optional product/domain rank check against the returned top 10 tools
 - Search history page with previous queries, optional product text, and provider results
 - Supabase-backed storage for products, queries, runs, results, providers, and search history
@@ -83,7 +83,7 @@ npm run build
 
 All provider adapters use the same `OPENROUTER_API_KEY` from the server environment.
 
-Each adapter tries its provider/latest model first, then falls back to current free model IDs when the paid/latest model fails. Free fallbacks run without the paid web plugin to avoid credit errors on accounts without purchased OpenRouter credits.
+Dashboard searches run only the free model IDs selected in the UI and do not enable OpenRouter's paid web plugin. Free model availability and rate limits are controlled by OpenRouter.
 
 ## Supabase Tables
 

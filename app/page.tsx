@@ -4,23 +4,17 @@ import { FormEvent, useState } from 'react';
 import Card from '@/components/atoms/Card';
 import Button from '@/components/atoms/Button';
 import Input from '@/components/atoms/Input';
-import type { ProviderName } from '@/lib/types';
 import type { RankedTool } from '@/lib/ranking/tools';
+import { DEFAULT_FREE_MODEL_IDS, FREE_MODELS, getFreeModel, type FreeModelId } from '@/lib/models/free-models';
 
 type SearchResult = {
-  provider: ProviderName;
+  model: FreeModelId;
   appears: boolean;
   rank: number | null;
   url: string | null;
   tools: RankedTool[];
   modelUsed: string | null;
   error: string | null;
-};
-
-const providerConfig: Record<string, { label: string; color: string; bgColor: string }> = {
-  perplexity: { label: 'Perplexity', color: '#22d3ee', bgColor: 'rgba(34,211,238,0.1)' },
-  chatgpt: { label: 'ChatGPT', color: '#10b981', bgColor: 'rgba(16,185,129,0.1)' },
-  gemini: { label: 'Gemini', color: '#818cf8', bgColor: 'rgba(129,140,248,0.1)' },
 };
 
 function getRankLabel(result: SearchResult, hasProduct: boolean): string {
@@ -33,6 +27,7 @@ export default function DashboardPage() {
   const [query, setQuery] = useState('');
   const [product, setProduct] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [selectedModels, setSelectedModels] = useState<FreeModelId[]>(DEFAULT_FREE_MODEL_IDS);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
@@ -49,7 +44,7 @@ export default function DashboardPage() {
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, product }),
+        body: JSON.stringify({ query, product, models: selectedModels }),
       });
       const data = (await response.json().catch(() => ({}))) as {
         error?: string;
@@ -69,6 +64,12 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleModel = (modelId: FreeModelId) => {
+    setSelectedModels((current) =>
+      current.includes(modelId) ? current.filter((id) => id !== modelId) : [...current, modelId]
+    );
   };
 
   return (
@@ -109,6 +110,35 @@ export default function DashboardPage() {
               {loading ? 'Searching...' : 'Search Rankings'}
             </Button>
           </div>
+
+          <fieldset>
+            <legend className="text-sm font-medium text-gray-300">Free OpenRouter models</legend>
+            <p className="mt-1 text-xs text-gray-500">Choose one or more models to compare. Requests use their free endpoints only.</p>
+            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+              {FREE_MODELS.map((model) => {
+                const selected = selectedModels.includes(model.id);
+                return (
+                  <label
+                    key={model.id}
+                    className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${
+                      selected ? 'border-indigo-400/50 bg-indigo-500/10' : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() => toggleModel(model.id)}
+                      className="h-4 w-4 accent-indigo-500"
+                    />
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium text-gray-100">{model.label}</span>
+                      <span className="block truncate text-xs text-gray-500">{model.brand} · {model.id}</span>
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
         </form>
       </Card>
 
@@ -121,17 +151,17 @@ export default function DashboardPage() {
       {searched && !error && results.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {results.map((result) => {
-            const config = providerConfig[result.provider] ?? {
-              label: result.provider,
+            const config = getFreeModel(result.model) ?? {
+              label: result.model,
               color: '#9ca3af',
               bgColor: 'rgba(156,163,175,0.1)',
             };
 
             return (
-              <Card key={result.provider} padding="sm">
+              <Card key={result.model} padding="sm">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs text-gray-500">Provider</p>
+                    <p className="text-xs text-gray-500">Model</p>
                     <p className="text-sm font-semibold" style={{ color: config.color }}>
                       {config.label}
                     </p>
@@ -157,14 +187,14 @@ export default function DashboardPage() {
       {searched && !error && results.length > 0 && (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           {results.map((result) => {
-            const config = providerConfig[result.provider] ?? {
-              label: result.provider,
+            const config = getFreeModel(result.model) ?? {
+              label: result.model,
               color: '#9ca3af',
               bgColor: 'rgba(156,163,175,0.1)',
             };
 
             return (
-              <Card key={result.provider} padding="sm">
+              <Card key={result.model} padding="sm">
                 <div
                   className="flex items-center gap-2 px-3 py-2 rounded-lg mb-3"
                   style={{ backgroundColor: config.bgColor }}
@@ -184,7 +214,7 @@ export default function DashboardPage() {
 
                       return (
                         <li
-                          key={`${result.provider}-${index}-${tool.url || tool.name}`}
+                          key={`${result.model}-${index}-${tool.url || tool.name}`}
                           className={`flex items-start gap-2 text-xs py-2 px-2 rounded-lg transition-colors ${
                             isMatch
                               ? 'bg-emerald-500/10 border border-emerald-500/20'
@@ -230,7 +260,7 @@ export default function DashboardPage() {
           <div className="text-center py-14">
             <h2 className="text-lg font-semibold text-white mb-2">Start with a search query</h2>
             <p className="text-sm text-gray-500 max-w-md mx-auto">
-              The results will show each provider&apos;s top 10 recommendations and your product&apos;s position when it appears.
+              The results will compare each selected free model&apos;s top 10 recommendations and your product&apos;s position when it appears.
             </p>
           </div>
         </Card>

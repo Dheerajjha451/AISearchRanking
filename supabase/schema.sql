@@ -7,7 +7,12 @@ CREATE TABLE IF NOT EXISTS providers (
 );
 
 -- Seed providers
-INSERT INTO providers (name) VALUES ('perplexity'), ('chatgpt'), ('gemini')
+INSERT INTO providers (name) VALUES
+  ('openai/gpt-oss-120b:free'),
+  ('tencent/hy3:free'),
+  ('openai/gpt-oss-20b:free'),
+  ('nvidia/nemotron-3-nano-30b-a3b:free'),
+  ('nvidia/nemotron-3-super-120b-a12b:free')
 ON CONFLICT (name) DO NOTHING;
 
 -- 2. Products

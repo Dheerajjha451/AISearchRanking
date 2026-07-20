@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "AI Ranking Monitor",
   description:
-    "Track how AI providers (Perplexity, ChatGPT, Gemini) rank your products across search queries",
+    "Compare how free OpenRouter models rank your products across search queries",
 };
 
 export default function RootLayout({

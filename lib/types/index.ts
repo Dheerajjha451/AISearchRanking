@@ -1,4 +1,5 @@
-export type ProviderName = 'perplexity' | 'chatgpt' | 'gemini' | 'openrouter';
+/** A provider/model identifier. Stored values may include legacy provider names. */
+export type ProviderName = string;
 
 /** Normalized result from any provider adapter */
 export type ProviderResult = {
@@ -66,7 +67,9 @@ export type SearchHistoryTool = {
 };
 
 export type SearchHistoryResult = {
-  provider: ProviderName;
+  /** `provider` is retained for history records created before model selection. */
+  provider?: ProviderName;
+  model?: string;
   appears: boolean;
   rank: number | null;
   url: string | null;

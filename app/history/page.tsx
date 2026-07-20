@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import Card from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
 import type { SearchHistory, SearchHistoryResult } from "@/lib/types";
+import { getFreeModel } from "@/lib/models/free-models";
 
-const providerConfig: Record<string, { label: string; color: string }> = {
+const legacyProviderConfig: Record<string, { label: string; color: string }> = {
   perplexity: { label: "Perplexity", color: "#22d3ee" },
   chatgpt: { label: "ChatGPT", color: "#10b981" },
   gemini: { label: "Gemini", color: "#818cf8" },
@@ -69,7 +70,7 @@ export default function HistoryPage() {
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold text-white">History</h1>
-          <p className="text-sm text-gray-500">Previous dashboard searches and their provider results.</p>
+          <p className="text-sm text-gray-500">Previous dashboard searches and their model results.</p>
         </div>
         <Button type="button" variant="secondary" onClick={fetchHistory} loading={loading}>
           Refresh
@@ -120,21 +121,22 @@ export default function HistoryPage() {
                       )}
                     </div>
                     <span className="w-fit rounded-full bg-white/5 px-2.5 py-1 text-xs font-medium text-gray-300">
-                      {entry.results.length} providers
+                      {entry.results.length} models
                     </span>
                   </div>
 
                   <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
                     {entry.results.map((result) => {
-                      const config = providerConfig[result.provider] ?? {
-                        label: result.provider,
+                      const resultId = result.model ?? result.provider ?? "Unknown model";
+                      const config = (result.model ? getFreeModel(result.model) : undefined) ?? legacyProviderConfig[resultId] ?? {
+                        label: resultId,
                         color: "#9ca3af",
                       };
                       const tools = result.tools.slice(0, 3);
 
                       return (
                         <div
-                          key={entry.id + "-" + result.provider}
+                          key={entry.id + "-" + resultId}
                           className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
                         >
                           <div className="mb-3 flex items-center justify-between gap-3">
